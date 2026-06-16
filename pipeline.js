@@ -153,13 +153,20 @@ const NLM_SCHEMA = {
 
 const roundResults = await parallel(queries.map((q, i) => () =>
   agent(`
-NotebookLM MCP를 사용하여 아래 쿼리를 노트북 ID "${notebookId}"에서 실행하세요.
+아래 쿼리에 대해 다음 순서로 실행하세요.
 
 【쿼리】
 ${q.prompt}
 
-mcp__notebooklm-mcp__notebook_query 도구를 호출하여 응답 전체를 rawText에 저장하세요.
-StructuredOutput으로 반환하세요.
+【실행 순서】
+1. mcp__notebooklm-mcp__research_start 도구로 이 쿼리 주제 딥리서치 시작:
+   - 노트북 ID: "${notebookId}"
+   - 검색어: 쿼리 핵심 키워드를 영어로 변환하여 사용
+2. mcp__notebooklm-mcp__research_status로 완료 대기 (complete 될 때까지 반복 확인)
+3. mcp__notebooklm-mcp__research_import로 노트북에 소스 추가
+4. mcp__notebooklm-mcp__notebook_query 도구로 위 쿼리를 노트북 ID "${notebookId}"에 실행
+5. 응답 전체를 rawText에 저장하고 StructuredOutput으로 반환
+
   `, {
     label: `NLM ${q.badge}`,
     phase: 'NotebookLM 탐색',

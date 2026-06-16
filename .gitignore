@@ -20,6 +20,10 @@ dist/
 next-env.d.ts
 tsconfig.tsbuildinfo
 
+# pipeline 실행 결과 및 개인 설정 (노트북 URL 포함)
+pipeline-config.json
+pipeline-result.json
+
 # misc
 .DS_Store
 *.pem

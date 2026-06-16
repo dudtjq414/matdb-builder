@@ -35,26 +35,30 @@
    - 예: `DMA 저장탄성률(E'), 나노인덴테이션, 압축시험`
    - 없으면 "없음" 또는 "-" 입력 → excludeNote는 빈 문자열("")로 처리
 
-### 2단계 — 워크플로우 실행
+### 2단계 — 설정 파일 저장
 
-모든 정보를 수집한 후 **반드시 아래 형식 그대로** Workflow 도구를 호출하세요.
+수집한 값을 **Write 도구**로 `pipeline-config.json` 파일에 저장하세요.
+파일 내용은 아래 JSON 형식을 그대로 사용하고, 꺾쇠 부분만 실제 값으로 교체합니다:
 
-```
-Workflow({
-  scriptPath: "pipeline.js",
-  args: {
-    notebookId: "<수집한 URL 또는 ID 그대로>",
-    material: "<수집한 재료명>",
-    propertyName: "<수집한 물성명>",
-    unit: "<수집한 단위>",
-    categoryLabel: "<수집한 분류 기준>",
-    excludeNote: "<수집한 제외 기준, 없으면 빈 문자열>",
-    outputPath: "./pipeline-result.json"
-  }
-})
+```json
+{
+  "notebookId": "<수집한 URL 전체 또는 ID>",
+  "material": "<수집한 재료명>",
+  "propertyName": "<수집한 물성명>",
+  "unit": "<수집한 단위>",
+  "categoryLabel": "<수집한 분류 기준>",
+  "excludeNote": "<수집한 제외 기준, 없으면 빈 문자열>",
+  "outputPath": "./pipeline-result.json"
+}
 ```
 
-**중요: args를 반드시 전달해야 합니다. args 없이 실행하면 노트북 ID가 없다는 오류가 납니다.**
+### 3단계 — 워크플로우 실행
+
+파일 저장이 완료되면 Workflow 도구로 pipeline.js를 실행하세요:
+
+```
+Workflow({ scriptPath: "pipeline.js" })
+```
 
 ### 3단계 — 완료 후
 

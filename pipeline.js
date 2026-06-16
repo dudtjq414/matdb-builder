@@ -32,18 +32,37 @@ function extractId(urlOrId) {
   return m ? m[1] : urlOrId;
 }
 
-const notebookId    = extractId(args?.notebookId    || CONFIG.notebookId);
-const material      = args?.material      || CONFIG.material;
-const propertyName  = args?.propertyName  || CONFIG.propertyName;
-const unit          = args?.unit          || CONFIG.unit;
-const categoryLabel = args?.categoryLabel || CONFIG.categoryLabel;
-const excludeNote   = (args?.excludeNote !== undefined && args?.excludeNote !== null)
-  ? (args.excludeNote === '없음' || args.excludeNote === '-' ? '' : args.excludeNote)
-  : CONFIG.excludeNote;
-const outputPath    = args?.outputPath    || CONFIG.outputPath;
+// pipeline-config.json에서 설정 읽기
+const CONFIG_SCHEMA = {
+  type: 'object',
+  properties: {
+    notebookId:    { type: 'string' },
+    material:      { type: 'string' },
+    propertyName:  { type: 'string' },
+    unit:          { type: 'string' },
+    categoryLabel: { type: 'string' },
+    excludeNote:   { type: 'string' },
+    outputPath:    { type: 'string' },
+  },
+  required: ['notebookId', 'material', 'propertyName', 'unit', 'categoryLabel'],
+};
+
+const fileConfig = await agent(
+  'pipeline-config.json 파일을 Read 도구로 읽고 내용을 StructuredOutput으로 반환하세요.',
+  { label: '설정 읽기', schema: CONFIG_SCHEMA }
+);
+
+const notebookId    = extractId(fileConfig?.notebookId    || CONFIG.notebookId);
+const material      = fileConfig?.material      || CONFIG.material;
+const propertyName  = fileConfig?.propertyName  || CONFIG.propertyName;
+const unit          = fileConfig?.unit          || CONFIG.unit;
+const categoryLabel = fileConfig?.categoryLabel || CONFIG.categoryLabel;
+const rawExclude    = fileConfig?.excludeNote   ?? CONFIG.excludeNote;
+const excludeNote   = (rawExclude === '없음' || rawExclude === '-') ? '' : rawExclude;
+const outputPath    = fileConfig?.outputPath    || CONFIG.outputPath;
 
 if (!notebookId || notebookId === 'YOUR_NOTEBOOK_ID_HERE') {
-  throw new Error('노트북 ID가 없습니다. Claude에게 "파이프라인 실행해줘"라고 말하면 자동으로 입력을 안내합니다.');
+  throw new Error('노트북 ID가 없습니다. pipeline-config.json 파일이 저장됐는지 확인하세요.');
 }
 
 // ── Phase 1: 7개 쿼리 생성 ────────────────────────────────────────────────────

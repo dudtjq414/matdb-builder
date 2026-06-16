@@ -2,8 +2,9 @@ export const meta = {
   name: 'matdb-pipeline',
   description: 'NotebookLM + Claude 자동 데이터 추출 파이프라인',
   phases: [
+    { title: '노트북 등록', detail: 'NotebookLM 노트북 등록 및 활성화' },
     { title: '쿼리 생성', detail: 'Claude가 연구 도메인 특화 7개 쿼리 생성' },
-    { title: 'NotebookLM 탐색', detail: '7개 쿼리 병렬 실행' },
+    { title: 'NotebookLM 탐색', detail: '7개 쿼리 병렬 실행 (ask_question)' },
     { title: '데이터 추출', detail: '각 라운드 결과에서 수치 파싱' },
     { title: '저장', detail: 'JSON 저장' },
   ],
@@ -19,7 +20,7 @@ const CONFIG = {
   propertyName: "Young's Modulus",
   unit: 'GPa',
   categoryLabel: '에폭시 계열',
-  excludeNote: "압축시험(compression test), DMA 저장탄성률(E'), 나노인덴테이션, Split-Hopkinson Bar 시험",
+  excludeNote: '',
   outputPath: './pipeline-result.json',
 };
 
@@ -32,6 +33,9 @@ function extractId(urlOrId) {
   return m ? m[1] : urlOrId;
 }
 
+const notebookUrl  = (args?.notebookId || CONFIG.notebookId).includes('notebooklm.google.com')
+  ? (args?.notebookId || CONFIG.notebookId)
+  : `https://notebooklm.google.com/notebook/${args?.notebookId || CONFIG.notebookId}`;
 const notebookId    = extractId(args?.notebookId    || CONFIG.notebookId);
 const material      = args?.material      || CONFIG.material;
 const propertyName  = args?.propertyName  || CONFIG.propertyName;
@@ -45,6 +49,21 @@ const outputPath    = args?.outputPath    || CONFIG.outputPath;
 if (!notebookId || notebookId === 'YOUR_NOTEBOOK_ID_HERE') {
   throw new Error('노트북 ID가 없습니다. Claude에게 "파이프라인 실행해줘"라고 말하면 자동으로 입력을 안내합니다.');
 }
+
+// ── Phase 0: 노트북 등록 및 활성화 ───────────────────────────────────────────
+phase('노트북 등록');
+
+await agent(`
+notebooklm-mcp v2.0.0 API를 사용하여 다음 순서로 노트북을 등록하세요.
+
+1. mcp__notebooklm-mcp__list_notebooks 도구로 이미 등록된 노트북 목록 확인
+2. 아래 URL의 노트북이 없으면 mcp__notebooklm-mcp__add_notebook 도구로 등록:
+   URL: ${notebookUrl}
+   name: ${material} - ${propertyName}
+3. 등록된 노트북의 id를 mcp__notebooklm-mcp__select_notebook 도구로 활성화
+
+3단계 모두 완료하세요.
+`, { label: '노트북 등록', phase: '노트북 등록' });
 
 // ── Phase 1: 7개 쿼리 생성 ────────────────────────────────────────────────────
 phase('쿼리 생성');
@@ -82,10 +101,10 @@ const genResult = await agent(`
 1. 종합 탐색: 전체 ${categoryLabel} 계열 수치 데이터를 표 형식으로 망라 (인장/굽힘 실험값 우선)
 2. 분류별 심층: ${categoryLabel}에 따른 ${propertyName} 차이를 정량적으로 비교 (범위·평균·대표값 포함)
 3. 친환경/바이오/신소재 계열 실험값 탐색 (범용 재료 대비 수치 비교 포함)
-4. MD/ML 계산값 vs 실험값 대응 탐색: 동일 시스템의 시뮬레이션 예측값과 실험값 모두 보고된 사례. 특히 MD 시뮬레이션 값만 있고 실험값이 없는 조합을 우선 발굴
+4. MD/ML 계산값 vs 실험값 대응 탐색: 동일 시스템의 시뮬레이션 예측값과 실험값 모두 보고된 사례
 5. 최근 5년(2020-2025) 고성능 달성 사례와 구조-물성 메커니즘
 6. 측정 방법 구별 및 수록 기준 검증 (방법별 수치 차이, 제외 기준 타당성)
-7. 데이터 공백 특화 탐색: ${material}에서 ${propertyName} 데이터가 희소한 계열/조합 집중 탐색 — 발견된 수치 전부 표로 정리
+7. 데이터 공백 특화 탐색: ${material}에서 ${propertyName} 데이터가 희소한 계열/조합 집중 탐색
 
 각 쿼리는 NotebookLM 채팅창에 바로 붙여넣을 수 있는 완결된 형태로, "${material}"와 "${propertyName}" 분야에 특화하여 작성하세요.
 반드시 7개 정확히 반환하세요. StructuredOutput으로 반환하세요.
@@ -94,7 +113,7 @@ const genResult = await agent(`
 const queries = genResult?.queries ?? [];
 log(`생성된 쿼리: ${queries.length}개`);
 
-// ── Phase 2: NotebookLM 7라운드 병렬 탐색 ────────────────────────────────────
+// ── Phase 2: NotebookLM 7라운드 병렬 탐색 (ask_question 사용) ──────────────
 phase('NotebookLM 탐색');
 
 const NLM_SCHEMA = {
@@ -108,13 +127,13 @@ const NLM_SCHEMA = {
 
 const roundResults = await parallel(queries.map((q, i) => () =>
   agent(`
-NotebookLM MCP를 사용하여 아래 쿼리를 노트북 ID "${notebookId}"에서 실행하세요.
+mcp__notebooklm-mcp__ask_question 도구를 사용하여 아래 질문을 실행하세요.
+(notebooklm-mcp v2.0.0 — notebook_query 대신 ask_question 사용)
 
-【쿼리】
+【질문】
 ${q.prompt}
 
-mcp__notebooklm-mcp__notebook_query 도구를 호출하여 응답 전체를 rawText에 저장하세요.
-StructuredOutput으로 반환하세요.
+응답 텍스트 전체를 rawText 필드에 저장하고 StructuredOutput으로 반환하세요.
   `, {
     label: `NLM ${q.badge}`,
     phase: 'NotebookLM 탐색',

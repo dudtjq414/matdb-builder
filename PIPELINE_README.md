@@ -37,15 +37,22 @@ results-viewer.html 에서 결과 검색·내보내기
 
 처음 파이프라인을 실행하면 **Google 로그인 창이 자동으로 열립니다.** NotebookLM에서 사용하는 Google 계정으로 로그인하면 인증이 완료됩니다.
 
-### 이 repo clone
+### 이 repo clone 및 시작
 
+PowerShell 또는 터미널에서:
+
+```powershell
+git clone https://github.com/dudtjq414/matdb-builder.git
+cd matdb-builder
+claude
 ```
-! git clone https://github.com/dudtjq414/matdb-builder.git
-```
 
-Claude Code에서 **matdb-builder 폴더를 열어주세요.**
+**`cd matdb-builder` 후 반드시 `claude`를 실행해야 합니다.**
+NotebookLM MCP는 Claude Code가 matdb-builder 폴더에서 시작될 때만 자동으로 로드됩니다.
 
-> **.claude/settings.json 자동 설정:** repo에 포함되어 있어 NotebookLM MCP 설정이 자동 적용됩니다. 별도 편집 불필요.
+> **`! cd matdb-builder`로는 안 됩니다.** Claude Code 채팅창의 `!`는 bash 서브프로세스만 이동시키므로, MCP 설정이 로드되지 않습니다.
+>
+> **.claude/settings.json 자동 설정:** repo에 포함되어 있어 올바른 폴더에서 시작하면 자동 적용됩니다.
 
 ---
 

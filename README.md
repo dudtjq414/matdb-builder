@@ -27,19 +27,32 @@ Claude Code 채팅창에서:
 
 ---
 
-## 설치
+## 설치 및 시작
 
-Claude Code 채팅창에서:
+### 1. 저장소 클론
 
+PowerShell 또는 터미널에서:
+
+```powershell
+git clone https://github.com/dudtjq414/matdb-builder.git
+cd matdb-builder
 ```
-! git clone https://github.com/dudtjq414/matdb-builder.git
+
+### 2. Claude Code를 matdb-builder 폴더에서 시작
+
+**이 단계가 매우 중요합니다.** Claude Code는 반드시 matdb-builder 폴더 안에서 실행해야 NotebookLM MCP가 자동으로 로드됩니다.
+
+```powershell
+claude
 ```
+
+> **`! cd matdb-builder` 후 "파이프라인 실행해줘"는 안 됩니다.** Claude Code 채팅창의 `!` 명령은 bash 서브프로세스만 이동시키므로, MCP 설정(`~/.claude/settings.json`)이 로드되지 않습니다. 반드시 터미널에서 `cd matdb-builder` 후 `claude`를 실행하세요.
 
 ---
 
 ## 사용법
 
-Claude Code에서 matdb-builder 폴더를 열고 채팅창에 입력합니다:
+matdb-builder 폴더에서 시작한 Claude Code 채팅창에 입력합니다:
 
 ```
 파이프라인 실행해줘

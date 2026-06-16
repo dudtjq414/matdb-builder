@@ -15,13 +15,11 @@
 
 ### 2. NotebookLM MCP 설치 및 로그인
 
-Claude Code를 열고 채팅창에 아래 명령어를 입력합니다 (`!` 를 앞에 붙이면 터미널 명령으로 실행됩니다):
+Claude Code 채팅창에서:
 
 ```
 ! npm install -g notebooklm-mcp
 ```
-
-설치 완료 후 Google 계정 로그인:
 
 ```
 ! nlm login
@@ -33,31 +31,42 @@ Claude Code를 열고 채팅창에 아래 명령어를 입력합니다 (`!` 를 
 
 ---
 
-## 실행 방법
+## 설치
 
-Claude Code 채팅창에서 순서대로 입력합니다:
+Claude Code 채팅창에서:
 
 ```
 ! git clone https://github.com/dudtjq414/matdb-builder.git
-```
-
-```
-! cd matdb-builder && npm install && npm run dev
-```
-
-브라우저에서 아래 주소로 접속합니다:
-
-```
-http://localhost:3000/pipeline
 ```
 
 ---
 
 ## 사용법
 
-1. **NotebookLM 준비** — https://notebooklm.google.com 에서 새 노트북 생성 후 논문 PDF·URL을 소스로 추가
-2. **파이프라인 설정** — 노트북 URL, 재료명, 측정 물성, 단위 등 입력
-3. **자동 실행** — "파이프라인 자동 실행" 버튼 클릭
-4. **결과 확인** — 5~10분 후 데이터 테이블에서 검색·JSON/CSV 내보내기
+Claude Code에서 matdb-builder 폴더를 열고 채팅창에 입력합니다:
+
+```
+파이프라인 실행해줘
+```
+
+Claude가 아래 정보를 하나씩 질문합니다:
+
+1. NotebookLM 노트북 URL
+2. 연구 재료/시스템
+3. 측정 물성
+4. 단위
+5. 분류 기준
+6. 제외 기준 (선택)
+
+모든 답변이 완료되면 자동으로 파이프라인이 실행됩니다. (약 5~10분 소요)
+
+---
+
+## 결과 확인
+
+파이프라인 완료 후 `pipeline-result.json`이 생성됩니다.
+`results-viewer.html`을 브라우저에서 열고 JSON 파일을 드래그하면 결과를 검색·필터링할 수 있습니다.
+
+---
 
 자세한 사용법은 [PIPELINE_README.md](./PIPELINE_README.md)를 참고하세요.

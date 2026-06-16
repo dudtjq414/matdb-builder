@@ -21,9 +21,13 @@ Claude Code 채팅창에서:
 ! npm install -g notebooklm-mcp
 ```
 
+그 다음 **Windows PowerShell** (또는 Mac 터미널)을 별도로 열어서 실행합니다:
+
 ```
-! nlm login
+nlm login
 ```
+
+> **`! nlm login`은 Windows에서 안 됩니다.** Claude Code의 `!` 명령은 Git Bash를 사용하는데, Windows npm 전역 바이너리가 Git Bash PATH에 없어서 "command not found"가 납니다. 반드시 별도 PowerShell 창에서 `nlm login`을 실행하세요.
 
 브라우저 창이 열리면 NotebookLM에서 사용하는 Google 계정으로 로그인합니다.
 

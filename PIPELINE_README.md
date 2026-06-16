@@ -39,11 +39,15 @@ Claude Code 채팅창에서:
 ! npm install -g notebooklm-mcp
 ```
 
+그 다음 **Windows PowerShell** (또는 Mac 터미널)을 별도로 열어서 실행합니다:
+
 ```
-! nlm login
+nlm login
 ```
 
-`! nlm login` 실행 후 브라우저 창이 열리면 Google 계정으로 로그인합니다.
+브라우저 창이 열리면 Google 계정으로 로그인합니다.
+
+> **`! nlm login`은 Windows에서 안 됩니다.** Claude Code의 `!` 명령은 Git Bash를 사용하는데, Windows npm 전역 바이너리가 Git Bash PATH에 없어서 "command not found"가 납니다. 반드시 별도 PowerShell 창에서 `nlm login`을 실행하세요.
 
 ### 이 repo clone
 
@@ -143,7 +147,8 @@ Claude가 아래 6가지를 하나씩 질문합니다:
 
 | 오류 | 해결 |
 |------|------|
-| NotebookLM MCP 쿼리 실패 | `! nlm login` 재실행 후 Google 재로그인 |
+| `nlm: command not found` | Claude Code `!` 대신 별도 PowerShell 창에서 `nlm login` 실행 |
+| NotebookLM MCP 쿼리 실패 | PowerShell에서 `nlm login` 재실행 후 Google 재로그인 |
 | 노트북에서 데이터를 못 찾음 | 노트북에 소스 추가 후 재실행 |
 | 추출 건수가 너무 적음 | 분류 기준을 넓히거나 제외 기준을 줄여서 재실행 |
 | Claude 세션 한도 초과 | 한도 리셋 후 "파이프라인 실행해줘" 재입력 |

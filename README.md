@@ -1,13 +1,13 @@
 # matdb-builder
 
-논문·기술 데이터시트·보고서에서 재료 물성 수치 데이터를 자동으로 수집하여 검색·내보내기 가능한 데이터베이스로 만드는 도구입니다.  
-NotebookLM의 딥리서치 기능과 Claude Code(AI)를 연동하며, **코드 수정 없이 채팅창 질문만으로** 전체 파이프라인이 실행됩니다.
+Automatically collect material property data from research papers, technical datasheets, and reports — organized into a searchable, filterable, CSV-exportable database.  
+Powered by NotebookLM deep research + Claude Code. **No code editing. Just answer 7 questions in chat.**
 
-> **실제 사례**: 아민계 에폭시 수지의 Young's Modulus 데이터 **95건**을 31편 논문에서 **약 8분** 만에 자동 추출
+> **Real-world result**: 95 entries of Young's Modulus data extracted from 31 papers for amine-cured epoxy resin in **~8 minutes**
 
 ---
 
-## 전체 흐름
+## How It Works
 
 ```mermaid
 flowchart LR
@@ -16,17 +16,17 @@ flowchart LR
     classDef auto fill:#3b0764,stroke:#d8b4fe,color:#fff,font-weight:bold
     classDef out  fill:#7c2d12,stroke:#fdba74,color:#fff,font-weight:bold
 
-    A(["① 설치\nClaude Code · Claude Pro\nnotebooklm-mcp-cli"]):::prep
-    B(["② 인증\nnlm login\nGoogle 계정"]):::prep
-    C(["③ 시작\ncd matdb-builder\n→ claude"]):::run
-    D(["④ 입력\n파이프라인 실행해줘\n7가지 정보"]):::run
-    E(["⑤ 자동 실행\nPhase 0 → 4\n5 ~ 10분"]):::auto
-    F(["⑥ 결과 확인\nresults-viewer\n검색 · CSV"]):::out
+    A(["① Install\nClaude Code · Claude Pro\nnotebooklm-mcp-cli"]):::prep
+    B(["② Authenticate\nnlm login\nGoogle Account"]):::prep
+    C(["③ Start\ncd matdb-builder\n→ claude"]):::run
+    D(["④ Input\nrun pipeline\n7 parameters"]):::run
+    E(["⑤ Auto Run\nPhase 0 → 4\n5 – 10 min"]):::auto
+    F(["⑥ View Results\nresults-viewer\nSearch · CSV"]):::out
 
     A --> B --> C --> D --> E --> F
 ```
 
-### 파이프라인 내부 구조
+### Pipeline Internals
 
 ```mermaid
 flowchart TD
@@ -36,16 +36,85 @@ flowchart TD
     classDef p3 fill:#14532d,stroke:#86efac,color:#fff,font-weight:bold
     classDef p4 fill:#7c2d12,stroke:#fdba74,color:#fff,font-weight:bold
 
-    P0["Phase 0  딥리서치\nNotebookLM이 웹에서 논문·데이터시트 자동 검색\n→ 노트북 소스 자동 추가"]:::p0
-    P1["Phase 1  쿼리 7개 생성\n연구 도메인 특화 탐색 방향 7가지 설계"]:::p1
-    P2["Phase 2  NotebookLM 7라운드 병렬 탐색\n쿼리별 딥리서치 → 소스 추가 → 응답 수집  ×7 동시"]:::p2
-    P3["Phase 3  데이터 추출\n재료명·수치·출처·연도·측정유형 파싱"]:::p3
-    P4["Phase 4  JSON 저장\n중복 제거 → 지정 파일 최종 저장"]:::p4
+    P0["Phase 0  Deep Research\nNotebookLM auto-searches web for papers & datasheets\n→ adds sources to notebook automatically"]:::p0
+    P1["Phase 1  Generate 7 Queries\nDesign 7 domain-specific search angles"]:::p1
+    P2["Phase 2  Parallel NLM Search x7\nDeep research → add sources → query response (x7 simultaneous)"]:::p2
+    P3["Phase 3  Data Extraction\nParse material name, value, reference, year, data type"]:::p3
+    P4["Phase 4  Save JSON\nDeduplicate → save to specified file"]:::p4
 
     P0 --> P1 --> P2 --> P3 --> P4
 ```
 
 ---
+
+## Prerequisites (One-time Setup)
+
+| Item | Steps |
+|------|-------|
+| **Claude Code** | [https://claude.ai/code](https://claude.ai/code) — Claude Pro subscription required ($20/mo) |
+| **Python 3.8+** | Run `python --version`. Install from [python.org](https://python.org) if missing |
+| **NotebookLM MCP CLI** | In PowerShell: `pip install notebooklm-mcp-cli` |
+| **NotebookLM Login** | In PowerShell: `nlm login` → sign in with your Google account |
+
+---
+
+## Installation
+
+```powershell
+git clone https://github.com/dudtjq414/matdb-builder.git
+cd matdb-builder
+claude
+```
+
+> **⚠️ You must run `claude` from inside the `matdb-builder` folder.**  
+> Claude Code reads `.claude/settings.json` to load the NotebookLM MCP — this only works when started from this directory.  
+> Typing `! cd matdb-builder` inside the Claude Code chat does **not** work.
+
+---
+
+## Usage
+
+Type in the Claude Code chat:
+
+```
+run pipeline
+```
+
+Claude will ask 7 questions one by one:
+
+| # | Parameter | Example |
+|---|-----------|---------|
+| 1 | NotebookLM notebook URL | `https://notebooklm.google.com/notebook/abc123-...` |
+| 2 | Material / system | `amine-cured epoxy resin` |
+| 3 | Property to measure | `Young's Modulus` |
+| 4 | Unit | `GPa` |
+| 5 | Data classification criterion | `epoxy type` |
+| 6 | Measurement methods to exclude | `DMA storage modulus, nanoindentation` (type `none` if not needed) |
+| 7 | Output filename | `epoxy-youngs-modulus.json` (type `none` for default) |
+
+The pipeline starts automatically after all 7 answers (~5–10 min).
+
+---
+
+## Viewing Results
+
+Open `results-viewer.html` in your browser, then drag and drop the generated JSON file to search, filter, sort, and export to CSV.
+
+---
+
+For full documentation → [PIPELINE_README.md](./PIPELINE_README.md)
+
+---
+
+<details>
+<summary>한국어 가이드 (Korean Guide)</summary>
+
+## 소개
+
+논문·기술 데이터시트·보고서에서 재료 물성 수치 데이터를 자동으로 수집하여 검색·내보내기 가능한 데이터베이스로 만드는 도구입니다.  
+NotebookLM의 딥리서치 기능과 Claude Code(AI)를 연동하며, **코드 수정 없이 채팅창 질문만으로** 전체 파이프라인이 실행됩니다.
+
+> **실제 사례**: 아민계 에폭시 수지의 Young's Modulus 데이터 **95건**을 31편 논문에서 **약 8분** 만에 자동 추출
 
 ## 사전 준비 (최초 1회)
 
@@ -56,8 +125,6 @@ flowchart TD
 | **NotebookLM MCP CLI** | PowerShell: `pip install notebooklm-mcp-cli` |
 | **NotebookLM 로그인** | PowerShell: `nlm login` → 브라우저에서 Google 계정 로그인 |
 
----
-
 ## 설치 및 시작
 
 ```powershell
@@ -67,10 +134,7 @@ claude
 ```
 
 > **⚠️ 반드시 `cd matdb-builder` 후 `claude`를 실행**해야 합니다.  
-> Claude Code가 matdb-builder 폴더에서 시작되어야 `.claude/settings.json`이 로드되어 NotebookLM MCP가 자동으로 연결됩니다.  
-> Claude Code 채팅창에서 `! cd matdb-builder`를 입력하는 방법은 **동작하지 않습니다.**
-
----
+> Claude Code가 matdb-builder 폴더에서 시작되어야 `.claude/settings.json`이 로드되어 NotebookLM MCP가 자동으로 연결됩니다.
 
 ## 사용법
 
@@ -92,15 +156,6 @@ Claude가 아래 7가지 정보를 하나씩 질문합니다:
 | 6 | 제외할 측정 방법 | `DMA E', 나노인덴테이션` (없으면 `없음`) |
 | 7 | 결과 파일명 | `epoxy-youngs-modulus.json` (없으면 `없음`) |
 
-모든 답변이 완료되면 **자동으로 파이프라인이 실행**됩니다. (약 5~10분 소요)
-
----
-
-## 결과 확인
-
-파이프라인 완료 후 지정한 JSON 파일이 생성됩니다.  
-`results-viewer.html`을 브라우저에서 열고 JSON 파일을 드래그하면 결과를 검색·필터링·CSV 내보내기할 수 있습니다.
-
----
-
 자세한 사용법은 [PIPELINE_README.md](./PIPELINE_README.md)를 참고하세요.
+
+</details>

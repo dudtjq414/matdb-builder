@@ -6,11 +6,15 @@
 
 ## 파이프라인 실행 방법
 
-사용자가 "파이프라인", "pipeline", "실행", "데이터 추출" 등을 요청하면 **아래 절차를 반드시 따르세요.**
+사용자가 "파이프라인", "pipeline", "실행", "데이터 추출", "run pipeline", "extract data", "start pipeline" 등을 요청하면 **아래 절차를 반드시 따르세요.**
+
+**언어 감지**: 사용자가 영어로 요청하면 질문도 영어로, 한국어로 요청하면 한국어로 진행하세요.
 
 ### 1단계 — 정보 수집 (실행 전에 반드시 먼저 질문)
 
 아래 항목을 **한 번에 하나씩** 물어보세요. 사용자가 대답하면 다음 질문으로 넘어가세요.
+
+**한국어 사용자:**
 
 1. **NotebookLM 노트북 URL**
    - 예: `https://notebooklm.google.com/notebook/abc123-def456-...`
@@ -39,6 +43,34 @@
    - 저장할 JSON 파일 이름 (확장자 .json 포함)
    - 예: `epoxy-youngs-modulus.json`, `cf-tensile-strength.json`
    - 없으면 "없음" 입력 → `pipeline-result.json`으로 저장
+
+**English users (ask in English):**
+
+1. **NotebookLM notebook URL**
+   - e.g. `https://notebooklm.google.com/notebook/abc123-def456-...`
+   - Paste the full URL (ID is extracted automatically)
+
+2. **Material / system to study**
+   - e.g. `amine-cured epoxy resin`, `carbon fiber composite`, `NMC cathode`
+   - More specific = better results
+
+3. **Property to measure**
+   - e.g. `Young's Modulus`, `tensile strength`, `thermal conductivity`
+
+4. **Unit**
+   - e.g. `GPa`, `MPa`, `W/mK`, `mS/cm`
+
+5. **Data classification criterion** (main grouping column)
+   - e.g. `epoxy type`, `curing agent`, `fiber orientation angle`
+
+6. **Measurement methods to exclude** (optional)
+   - e.g. `DMA storage modulus (E'), nanoindentation, compression test`
+   - Type `none` if not applicable → excludeNote will be empty
+
+7. **Output filename**
+   - JSON filename including `.json` extension
+   - e.g. `epoxy-youngs-modulus.json`, `cf-tensile-strength.json`
+   - Type `none` → saves as `pipeline-result.json`
 
 ### 2단계 — 설정 파일 저장
 

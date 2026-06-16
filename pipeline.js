@@ -1,57 +1,3 @@
-/**
- * matdb-pipeline.js
- *
- * NotebookLM + Claude 자동 데이터 추출 파이프라인
- *
- * 사용법:
- *   1. 아래 CONFIG 섹션의 값을 본인 연구에 맞게 수정
- *   2. Claude Code 세션에서 실행:
- *        /workflow pipeline.js
- *      또는 Claude Code 채팅에서:
- *        "이 파일을 워크플로우로 실행해줘" + 파일 첨부
- *
- * 사전 준비:
- *   - Claude Code 설치 (claude.ai/code)
- *   - NotebookLM MCP 설정 (아래 README 참고)
- *   - NotebookLM에 논문 소스 업로드 완료
- */
-
-// ═══════════════════════════════════════════════════════════════
-//  CONFIG — 여기만 수정하세요
-// ═══════════════════════════════════════════════════════════════
-
-const CONFIG = {
-  // NotebookLM 노트북 ID
-  // 방법: notebooklm.google.com → 노트북 열기 → URL에서 복사
-  // 예: https://notebooklm.google.com/notebook/abc123-def456 → "abc123-def456"
-  notebookId: 'YOUR_NOTEBOOK_ID_HERE',
-
-  // 연구 대상 재료 (구체적일수록 좋음)
-  material: '아민계 경화 에폭시 수지',
-
-  // 측정하려는 물성
-  propertyName: "Young's Modulus",
-
-  // 물성 단위
-  unit: 'GPa',
-
-  // 데이터 분류 기준 (표의 주요 열 기준)
-  // 예: "에폭시 계열", "경화제 종류", "온도", "섬유 배향각"
-  categoryLabel: '에폭시 계열',
-
-  // 제외할 데이터 유형 (있으면 노이즈 크게 줄어듦)
-  // 예: "압축시험, DMA 저장탄성률(E'), 나노인덴테이션"
-  // 없으면 빈 문자열: ''
-  excludeNote: "압축시험(compression test), DMA 저장탄성률(E'), 나노인덴테이션, Split-Hopkinson Bar 시험",
-
-  // 결과 저장 경로 (절대 경로 또는 상대 경로)
-  outputPath: './pipeline-result.json',
-};
-
-// ═══════════════════════════════════════════════════════════════
-//  워크플로우 본문 — 수정 불필요
-// ═══════════════════════════════════════════════════════════════
-
 export const meta = {
   name: 'matdb-pipeline',
   description: 'NotebookLM + Claude 자동 데이터 추출 파이프라인',
@@ -63,7 +9,24 @@ export const meta = {
   ],
 };
 
-// args로 전달받은 값 우선, 없으면 CONFIG 사용
+// ═══════════════════════════════════════════════════════════════
+//  CONFIG — args로 전달받지 못한 경우의 기본값
+// ═══════════════════════════════════════════════════════════════
+
+const CONFIG = {
+  notebookId: 'YOUR_NOTEBOOK_ID_HERE',
+  material: '아민계 경화 에폭시 수지',
+  propertyName: "Young's Modulus",
+  unit: 'GPa',
+  categoryLabel: '에폭시 계열',
+  excludeNote: "압축시험(compression test), DMA 저장탄성률(E'), 나노인덴테이션, Split-Hopkinson Bar 시험",
+  outputPath: './pipeline-result.json',
+};
+
+// ═══════════════════════════════════════════════════════════════
+//  워크플로우 본문
+// ═══════════════════════════════════════════════════════════════
+
 function extractId(urlOrId) {
   const m = (urlOrId || '').match(/notebook\/([a-zA-Z0-9_-]+)/);
   return m ? m[1] : urlOrId;
@@ -74,7 +37,9 @@ const material      = args?.material      || CONFIG.material;
 const propertyName  = args?.propertyName  || CONFIG.propertyName;
 const unit          = args?.unit          || CONFIG.unit;
 const categoryLabel = args?.categoryLabel || CONFIG.categoryLabel;
-const excludeNote   = args?.excludeNote   !== undefined ? args.excludeNote : CONFIG.excludeNote;
+const excludeNote   = (args?.excludeNote !== undefined && args?.excludeNote !== null)
+  ? (args.excludeNote === '없음' || args.excludeNote === '-' ? '' : args.excludeNote)
+  : CONFIG.excludeNote;
 const outputPath    = args?.outputPath    || CONFIG.outputPath;
 
 if (!notebookId || notebookId === 'YOUR_NOTEBOOK_ID_HERE') {

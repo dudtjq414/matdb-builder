@@ -271,12 +271,12 @@ function exportCSV() {
     if (q && !`${e.materialName} ${e.category} ${e.reference}`.toLowerCase().includes(q)) return false;
     return true;
   });
-  const header = `materialName,category,value,unit,dataType,reference,year,notes`;
+  const header = `Material Name,Category,Value,Unit,Data Type,Reference,Year,Notes`;
   const body = rows.map(e =>
     [e.materialName,e.category,e.value,unit,e.dataType,e.reference,e.year,e.notes]
       .map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(',')
   ).join('\n');
-  const blob = new Blob([header+'\n'+body], {type:'text/csv;charset=utf-8'});
+  const blob = new Blob(['﻿'+header+'\n'+body], {type:'text/csv;charset=utf-8'});
   const a = Object.assign(document.createElement('a'),{href:URL.createObjectURL(blob),download:'matdb-results.csv'});
   a.click();
 }

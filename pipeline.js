@@ -230,6 +230,18 @@ ${excludeNote ? excludeNote : '없음'}
 1. 위 기준을 만족하는 수치 데이터를 빠짐없이 추출하세요
 2. 같은 재료라도 조건이 다르면 별도 항목으로 추출
 3. 수치 없는 항목은 excluded에 이유와 함께 기재
+4. materialName과 category는 반드시 영어로 작성하세요 (예: "Amine-cured epoxy", "DGEBA/DETA", "Epoxy/carbon fiber")
+5. reference는 출처 종류에 맞게 아래 형식으로 작성하세요:
+   - 학술논문: "1저자 성 et al. (연도), 저널명"
+     예: "Kim et al. (2023), Polymer" / "Zhang (2021), J. Mater. Sci."
+   - 기술 데이터시트: "제조사명, 제품명/등급 Datasheet (연도)"
+     예: "Huntsman, Araldite LY1564 Datasheet (2020)" / "Hexion, EPON 828 TDS (2019)"
+   - 규격/표준: "표준기관, 표준번호:연도"
+     예: "ASTM D638-22" / "ISO 527-1:2019"
+   - 보고서/백서: "기관명 (연도), 문서 제목 앞 5단어"
+     예: "Toray Industries (2022), Carbon Fiber T700S Properties"
+   - 절대로 "출처 1", "논문 A", "데이터시트" 처럼 특정할 수 없는 모호한 표현 금지
+6. notes에는 DOI, URL, 제품 코드, 또는 전체 제목/문서명을 포함하세요
 
 【NotebookLM 응답 텍스트】
 ${(round.rawText ?? '').slice(0, 10000)}

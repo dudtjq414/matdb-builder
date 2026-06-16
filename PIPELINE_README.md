@@ -31,24 +31,18 @@ results-viewer.html 에서 결과 검색·내보내기
 1. https://claude.ai/code 에서 설치
 2. Claude Pro 구독 필요 (월 $20)
 
-### NotebookLM MCP 설치
+### NotebookLM MCP 설치 및 로그인
 
-Claude Code 채팅창에서:
+**Windows 시작 메뉴에서 PowerShell을 열고** 아래 두 명령을 순서대로 실행합니다:
 
-```
-! npm install -g notebooklm-mcp
-```
-
-그 다음 Claude Code 채팅창에서 아래 명령을 실행합니다:
-
-```
-! cmd /c nlm login
+```powershell
+npm install -g notebooklm-mcp
+nlm login
 ```
 
-브라우저 창이 열리면 Google 계정으로 로그인합니다.
+브라우저가 열리면 Google 계정으로 로그인합니다.
 
-> **`! nlm login`은 Windows에서 안 됩니다.** Claude Code의 `!`는 Git Bash를 사용하는데, Windows npm 전역 바이너리가 Git Bash PATH에 없습니다. `cmd /c`를 앞에 붙이면 Windows cmd를 거쳐 실행됩니다.
-> Mac/Linux에서는 `! nlm login`을 그대로 사용하세요.
+> **Claude Code 채팅창의 `!` 명령으로는 안 됩니다.** `!`는 Git Bash를 사용하는데, Windows에서 npm 전역 바이너리가 Git Bash PATH에 없습니다. 반드시 PowerShell에서 직접 실행하세요.
 
 ### 이 repo clone
 
@@ -148,8 +142,8 @@ Claude가 아래 6가지를 하나씩 질문합니다:
 
 | 오류 | 해결 |
 |------|------|
-| `nlm: command not found` | `! nlm login` 대신 `! cmd /c nlm login` 사용 (Windows) |
-| NotebookLM MCP 쿼리 실패 | `! cmd /c nlm login` 재실행 후 Google 재로그인 |
+| `nlm: command not found` | Claude Code `!` 대신 PowerShell 창에서 `nlm login` 실행 |
+| NotebookLM MCP 쿼리 실패 | PowerShell에서 `nlm login` 재실행 후 Google 재로그인 |
 | 노트북에서 데이터를 못 찾음 | 노트북에 소스 추가 후 재실행 |
 | 추출 건수가 너무 적음 | 분류 기준을 넓히거나 제외 기준을 줄여서 재실행 |
 | Claude 세션 한도 초과 | 한도 리셋 후 "파이프라인 실행해줘" 재입력 |

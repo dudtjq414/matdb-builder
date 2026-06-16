@@ -13,24 +13,18 @@
 3. 설치 후 Claude Code 실행
 4. Claude Pro 구독 필요 (월 $20) — 구독하지 않았다면 앱 내에서 가입
 
-### 2. NotebookLM MCP 설치 및 로그인
+### 2. NotebookLM 로그인
 
-Claude Code 채팅창에서:
+**Windows 시작 메뉴에서 PowerShell을 열고** 아래 두 명령을 순서대로 실행합니다:
 
-```
-! npm install -g notebooklm-mcp
-```
-
-그 다음 Claude Code 채팅창에서 아래 명령을 실행합니다:
-
-```
-! cmd /c nlm login
+```powershell
+npm install -g notebooklm-mcp
+nlm login
 ```
 
-> **`! nlm login`은 Windows에서 안 됩니다.** Claude Code의 `!`는 Git Bash를 사용하는데, Windows npm 전역 바이너리가 Git Bash PATH에 없습니다. `cmd /c`를 앞에 붙이면 Windows cmd를 거쳐 실행되어 `nlm`을 찾을 수 있습니다.
-> Mac/Linux에서는 `! nlm login`을 그대로 사용하세요.
+브라우저가 열리면 NotebookLM에서 사용하는 Google 계정으로 로그인합니다.
 
-브라우저 창이 열리면 NotebookLM에서 사용하는 Google 계정으로 로그인합니다.
+> **Claude Code 채팅창의 `!` 명령으로는 안 됩니다.** `!`는 Git Bash를 사용하는데, Windows에서 npm 전역 바이너리가 Git Bash PATH에 없습니다. 반드시 PowerShell에서 직접 실행하세요.
 
 > **MCP 설정은 자동입니다.** 이 repo에 `.claude/settings.json`이 포함되어 있어 clone 후 Claude Code가 NotebookLM MCP를 자동으로 인식합니다.
 

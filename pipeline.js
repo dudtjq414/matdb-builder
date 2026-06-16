@@ -63,10 +63,22 @@ export const meta = {
   ],
 };
 
-const { notebookId, material, propertyName, unit, categoryLabel, excludeNote, outputPath } = CONFIG;
+// args로 전달받은 값 우선, 없으면 CONFIG 사용
+function extractId(urlOrId) {
+  const m = (urlOrId || '').match(/notebook\/([a-zA-Z0-9_-]+)/);
+  return m ? m[1] : urlOrId;
+}
 
-if (notebookId === 'YOUR_NOTEBOOK_ID_HERE') {
-  throw new Error('CONFIG.notebookId를 설정해주세요. NotebookLM URL에서 노트북 ID를 복사하세요.');
+const notebookId    = extractId(args?.notebookId    || CONFIG.notebookId);
+const material      = args?.material      || CONFIG.material;
+const propertyName  = args?.propertyName  || CONFIG.propertyName;
+const unit          = args?.unit          || CONFIG.unit;
+const categoryLabel = args?.categoryLabel || CONFIG.categoryLabel;
+const excludeNote   = args?.excludeNote   !== undefined ? args.excludeNote : CONFIG.excludeNote;
+const outputPath    = args?.outputPath    || CONFIG.outputPath;
+
+if (!notebookId || notebookId === 'YOUR_NOTEBOOK_ID_HERE') {
+  throw new Error('노트북 ID가 없습니다. Claude에게 "파이프라인 실행해줘"라고 말하면 자동으로 입력을 안내합니다.');
 }
 
 // ── Phase 1: 7개 쿼리 생성 ────────────────────────────────────────────────────

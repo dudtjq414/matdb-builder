@@ -35,10 +35,16 @@
    - 예: `DMA 저장탄성률(E'), 나노인덴테이션, 압축시험`
    - 없으면 "없음" 또는 "-" 입력 → excludeNote는 빈 문자열("")로 처리
 
+7. **결과 파일명**
+   - 저장할 JSON 파일 이름 (확장자 .json 포함)
+   - 예: `epoxy-youngs-modulus.json`, `cf-tensile-strength.json`
+   - 없으면 "없음" 입력 → `pipeline-result.json`으로 저장
+
 ### 2단계 — 설정 파일 저장
 
 수집한 값을 **Write 도구**로 `pipeline-config.json` 파일에 저장하세요.
-파일 내용은 아래 JSON 형식을 그대로 사용하고, 꺾쇠 부분만 실제 값으로 교체합니다:
+파일 내용은 아래 JSON 형식을 그대로 사용하고, 꺾쇠 부분만 실제 값으로 교체합니다.
+7번 파일명이 "없음"이면 outputPath는 `"./pipeline-result.json"`으로 씁니다:
 
 ```json
 {
@@ -48,7 +54,7 @@
   "unit": "<수집한 단위>",
   "categoryLabel": "<수집한 분류 기준>",
   "excludeNote": "<수집한 제외 기준, 없으면 빈 문자열>",
-  "outputPath": "./pipeline-result.json"
+  "outputPath": "./<수집한 파일명>"
 }
 ```
 
@@ -60,9 +66,9 @@
 Workflow({ scriptPath: "pipeline.js" })
 ```
 
-### 3단계 — 완료 후
+### 4단계 — 완료 후
 
-파이프라인이 완료되면 `pipeline-result.json`이 생성됩니다.
+파이프라인이 완료되면 지정한 파일명으로 JSON이 생성됩니다.
 `results-viewer.html`을 브라우저에서 열고 JSON 파일을 드래그하면 결과를 검색할 수 있습니다.
 
 ---

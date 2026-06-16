@@ -71,6 +71,7 @@ export default function PipelinePage() {
   const [active, setActive] = useState(0);
   const [running, setRunning] = useState(false);
   const [statusMsg, setStatusMsg] = useState('');
+  const [runError, setRunError] = useState('');
   const [search, setSearch] = useState('');
   const [copied, setCopied] = useState<number | null>(null);
   const [showKey, setShowKey] = useState(false);
@@ -119,6 +120,7 @@ export default function PipelinePage() {
   async function handleAutoRun() {
     if (!canRun) return;
     setRunning(true);
+    setRunError('');
     setStatusMsg('쿼리 생성 중...');
     setQueries([]);
     setRounds([]);
@@ -127,7 +129,7 @@ export default function PipelinePage() {
     // 1. 쿼리 생성
     const genRes = await post('/api/generate-queries', { schema }, cfg.apiKey || undefined);
     if (genRes.error) {
-      setStatusMsg(`오류: ${genRes.error}`);
+      setRunError(genRes.error);
       setRunning(false);
       return;
     }
@@ -342,6 +344,18 @@ export default function PipelinePage() {
                   ? '② 쿼리 자동 생성 + 탐색 가이드 시작 →'
                   : '② 파이프라인 실행 →'}
           </button>
+
+          {runError && (
+            <div className="bg-red-950/40 border border-red-800/60 rounded-xl p-3 text-xs text-red-300 space-y-1">
+              <p className="font-semibold">오류 발생</p>
+              <p className="font-mono break-all">{runError}</p>
+              {runError.includes('ENOENT') || runError.includes('not found') || runError.includes('찾을 수') ? (
+                <p className="text-red-400/80 mt-1">Claude CLI를 찾을 수 없습니다. Claude Code가 실행 중인지 확인하거나, API 키를 입력해주세요.</p>
+              ) : runError.includes('timeout') ? (
+                <p className="text-red-400/80 mt-1">응답 시간 초과. 다시 시도해주세요.</p>
+              ) : null}
+            </div>
+          )}
 
           {!canRun && !running && (
             <p className="text-xs text-amber-500 text-center">

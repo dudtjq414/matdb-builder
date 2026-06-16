@@ -8,17 +8,33 @@ export function detectProvider(key: string): LLMProvider {
 
 // 로컬 claude CLI 호출 (Claude Code Pro 설치 시 API 키 불필요)
 async function callClaudeCLI(systemPrompt: string, userPrompt: string): Promise<string> {
-  const { execFile } = await import('child_process');
+  const { exec } = await import('child_process');
+  const { writeFile, unlink } = await import('fs/promises');
+  const { tmpdir } = await import('os');
+  const { join } = await import('path');
   const { promisify } = await import('util');
-  const execFileAsync = promisify(execFile);
+  const execAsync = promisify(exec);
 
-  const fullPrompt = `${systemPrompt}\n\n${userPrompt}`;
-  const { stdout } = await execFileAsync(
-    'claude',
-    ['-p', fullPrompt, '--output-format', 'text'],
-    { timeout: 120_000, maxBuffer: 10 * 1024 * 1024 }
-  );
-  return stdout.trim();
+  // 프롬프트를 임시 파일에 저장 (CLI 인자 길이 제한 + 특수문자 문제 회피)
+  const tmpPath = join(tmpdir(), `matdb_${Date.now()}.txt`);
+  await writeFile(tmpPath, `${systemPrompt}\n\n${userPrompt}`, 'utf8');
+
+  try {
+    const isWin = process.platform === 'win32';
+    const winPath = tmpPath.replace(/\//g, '\\');
+    // exec()는 shell을 통해 실행하므로 Windows에서 claude.cmd도 정상 인식
+    const cmd = isWin
+      ? `powershell -NoProfile -Command "claude -p (Get-Content -Raw -Encoding UTF8 '${winPath}') --output-format text"`
+      : `claude -p "$(cat '${tmpPath}')" --output-format text`;
+
+    const { stdout } = await execAsync(cmd, {
+      timeout: 120_000,
+      maxBuffer: 10 * 1024 * 1024,
+    });
+    return stdout.trim();
+  } finally {
+    await unlink(tmpPath).catch(() => {});
+  }
 }
 
 export async function callLLM(

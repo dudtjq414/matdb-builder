@@ -37,20 +37,25 @@
 
 ### 2단계 — 워크플로우 실행
 
-모든 정보를 수집한 후 Workflow 도구로 `pipeline.js`를 실행하세요.
+모든 정보를 수집한 후 **반드시 아래 형식 그대로** Workflow 도구를 호출하세요.
+`scriptPath`는 `"pipeline.js"`, `args`는 수집한 값으로 채운 JSON 객체입니다.
 
-args에 수집한 값을 객체로 전달:
 ```
-{
-  notebookId: "사용자가 알려준 URL 또는 ID",
-  material: "재료명",
-  propertyName: "물성명",
-  unit: "단위",
-  categoryLabel: "분류 기준",
-  excludeNote: "제외 기준 (없으면 빈 문자열)",
-  outputPath: "./pipeline-result.json"
-}
+Workflow({
+  scriptPath: "pipeline.js",
+  args: {
+    notebookId: "<수집한 URL 또는 ID 그대로>",
+    material: "<수집한 재료명>",
+    propertyName: "<수집한 물성명>",
+    unit: "<수집한 단위>",
+    categoryLabel: "<수집한 분류 기준>",
+    excludeNote: "<수집한 제외 기준, 없으면 빈 문자열>",
+    outputPath: "./pipeline-result.json"
+  }
+})
 ```
+
+**중요: args를 반드시 전달해야 합니다. args 없이 실행하면 노트북 ID가 없다는 오류가 납니다.**
 
 ### 3단계 — 완료 후
 
@@ -62,5 +67,5 @@ args에 수집한 값을 객체로 전달:
 ## 주의사항
 
 - NotebookLM MCP(`notebooklm-mcp`)가 설정되어 있어야 자동 실행됩니다
-- MCP 없이 실행하면 각 라운드에서 수동 붙여넣기 필요
+- MCP 연결 문제가 있으면 `/doctor`를 실행하여 확인하세요
 - 노트북에 논문 소스가 최소 5편 이상 있어야 결과가 충분합니다

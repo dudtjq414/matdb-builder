@@ -16,6 +16,10 @@ dist/
 # Vercel
 .vercel
 
+# auto-generated
+next-env.d.ts
+tsconfig.tsbuildinfo
+
 # misc
 .DS_Store
 *.pem

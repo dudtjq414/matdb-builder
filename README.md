@@ -10,43 +10,47 @@
 
 1. https://claude.ai/code 접속
 2. **Download for Windows** (또는 Mac) 클릭하여 설치
-3. 설치 후 Claude Code 실행
-4. Claude Pro 구독 필요 (월 $20) — 구독하지 않았다면 앱 내에서 가입
+3. Claude Pro 구독 필요 (월 $20)
 
-### 2. Node.js 설치 확인
+### 2. Python 설치 확인
 
-Claude Code 채팅창에서:
+PowerShell에서:
 
+```powershell
+python --version
 ```
-! node --version
+
+Python 3.8 이상이 필요합니다. 없으면 https://python.org 에서 설치하세요.
+
+### 3. NotebookLM MCP CLI 설치 및 로그인
+
+PowerShell에서:
+
+```powershell
+pip install notebooklm-mcp-cli
+nlm login
 ```
 
-버전이 출력되면 됩니다. Node.js가 없다면 https://nodejs.org 에서 설치하세요.
+브라우저가 열리면 NotebookLM에서 사용하는 Google 계정으로 로그인합니다.
 
-> **MCP 설정과 설치는 자동입니다.** 이 repo에 `.claude/settings.json`이 포함되어 있어 clone 후 Claude Code가 NotebookLM MCP를 자동으로 내려받고 실행합니다. 처음 파이프라인 실행 시 Google 로그인 창이 자동으로 열립니다.
+> 참고: https://github.com/jacob-bd/notebooklm-mcp-cli
 
 ---
 
 ## 설치 및 시작
 
-### 1. 저장소 클론
-
-PowerShell 또는 터미널에서:
+PowerShell에서:
 
 ```powershell
 git clone https://github.com/dudtjq414/matdb-builder.git
 cd matdb-builder
-```
-
-### 2. Claude Code를 matdb-builder 폴더에서 시작
-
-**이 단계가 매우 중요합니다.** Claude Code는 반드시 matdb-builder 폴더 안에서 실행해야 NotebookLM MCP가 자동으로 로드됩니다.
-
-```powershell
 claude
 ```
 
-> **`! cd matdb-builder` 후 "파이프라인 실행해줘"는 안 됩니다.** Claude Code 채팅창의 `!` 명령은 bash 서브프로세스만 이동시키므로, MCP 설정(`~/.claude/settings.json`)이 로드되지 않습니다. 반드시 터미널에서 `cd matdb-builder` 후 `claude`를 실행하세요.
+**`cd matdb-builder` 후 반드시 `claude`를 실행해야 합니다.**
+NotebookLM MCP는 Claude Code가 matdb-builder 폴더에서 시작될 때만 자동으로 로드됩니다.
+
+> `.claude/settings.json`이 repo에 포함되어 있어 MCP 설정이 자동 적용됩니다.
 
 ---
 
@@ -58,11 +62,8 @@ matdb-builder 폴더에서 시작한 Claude Code 채팅창에 입력합니다:
 파이프라인 실행해줘
 ```
 
-Claude가 순서대로 진행합니다:
+Claude가 아래 정보를 하나씩 질문합니다:
 
-**0단계 (최초 1회)** — Google 로그인 확인. 로그인이 안 된 경우 브라우저 창이 열리면 NotebookLM에서 사용하는 Google 계정으로 로그인합니다.
-
-**1~6단계** — 아래 정보를 하나씩 질문합니다:
 1. NotebookLM 노트북 URL
 2. 연구 재료/시스템
 3. 측정 물성

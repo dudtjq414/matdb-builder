@@ -2,9 +2,8 @@ export const meta = {
   name: 'matdb-pipeline',
   description: 'NotebookLM + Claude 자동 데이터 추출 파이프라인',
   phases: [
-    { title: '노트북 등록', detail: 'NotebookLM 노트북 등록 및 활성화' },
     { title: '쿼리 생성', detail: 'Claude가 연구 도메인 특화 7개 쿼리 생성' },
-    { title: 'NotebookLM 탐색', detail: '7개 쿼리 병렬 실행 (ask_question)' },
+    { title: 'NotebookLM 탐색', detail: '7개 쿼리 병렬 실행' },
     { title: '데이터 추출', detail: '각 라운드 결과에서 수치 파싱' },
     { title: '저장', detail: 'JSON 저장' },
   ],
@@ -33,9 +32,6 @@ function extractId(urlOrId) {
   return m ? m[1] : urlOrId;
 }
 
-const notebookUrl  = (args?.notebookId || CONFIG.notebookId).includes('notebooklm.google.com')
-  ? (args?.notebookId || CONFIG.notebookId)
-  : `https://notebooklm.google.com/notebook/${args?.notebookId || CONFIG.notebookId}`;
 const notebookId    = extractId(args?.notebookId    || CONFIG.notebookId);
 const material      = args?.material      || CONFIG.material;
 const propertyName  = args?.propertyName  || CONFIG.propertyName;
@@ -49,21 +45,6 @@ const outputPath    = args?.outputPath    || CONFIG.outputPath;
 if (!notebookId || notebookId === 'YOUR_NOTEBOOK_ID_HERE') {
   throw new Error('노트북 ID가 없습니다. Claude에게 "파이프라인 실행해줘"라고 말하면 자동으로 입력을 안내합니다.');
 }
-
-// ── Phase 0: 노트북 등록 및 활성화 ───────────────────────────────────────────
-phase('노트북 등록');
-
-await agent(`
-notebooklm-mcp v2.0.0 API를 사용하여 다음 순서로 노트북을 등록하세요.
-
-1. mcp__notebooklm-mcp__list_notebooks 도구로 이미 등록된 노트북 목록 확인
-2. 아래 URL의 노트북이 없으면 mcp__notebooklm-mcp__add_notebook 도구로 등록:
-   URL: ${notebookUrl}
-   name: ${material} - ${propertyName}
-3. 등록된 노트북의 id를 mcp__notebooklm-mcp__select_notebook 도구로 활성화
-
-3단계 모두 완료하세요.
-`, { label: '노트북 등록', phase: '노트북 등록' });
 
 // ── Phase 1: 7개 쿼리 생성 ────────────────────────────────────────────────────
 phase('쿼리 생성');
@@ -113,7 +94,7 @@ const genResult = await agent(`
 const queries = genResult?.queries ?? [];
 log(`생성된 쿼리: ${queries.length}개`);
 
-// ── Phase 2: NotebookLM 7라운드 병렬 탐색 (ask_question 사용) ──────────────
+// ── Phase 2: NotebookLM 7라운드 병렬 탐색 ────────────────────────────────────
 phase('NotebookLM 탐색');
 
 const NLM_SCHEMA = {
@@ -127,13 +108,13 @@ const NLM_SCHEMA = {
 
 const roundResults = await parallel(queries.map((q, i) => () =>
   agent(`
-mcp__notebooklm-mcp__ask_question 도구를 사용하여 아래 질문을 실행하세요.
-(notebooklm-mcp v2.0.0 — notebook_query 대신 ask_question 사용)
+NotebookLM MCP를 사용하여 아래 쿼리를 노트북 ID "${notebookId}"에서 실행하세요.
 
-【질문】
+【쿼리】
 ${q.prompt}
 
-응답 텍스트 전체를 rawText 필드에 저장하고 StructuredOutput으로 반환하세요.
+mcp__notebooklm-mcp__notebook_query 도구를 호출하여 응답 전체를 rawText에 저장하세요.
+StructuredOutput으로 반환하세요.
   `, {
     label: `NLM ${q.badge}`,
     phase: 'NotebookLM 탐색',
@@ -229,7 +210,6 @@ for (const e of deduped) {
 }
 
 log(`추출 완료: ${deduped.length}건 수록 / ${allExcluded.length}건 제외`);
-log(`계열별: ${JSON.stringify(byCategory, null, 2)}`);
 
 const result = {
   material,

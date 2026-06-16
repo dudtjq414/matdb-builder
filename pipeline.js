@@ -2,6 +2,7 @@ export const meta = {
   name: 'matdb-pipeline',
   description: 'NotebookLM + Claude 자동 데이터 추출 파이프라인',
   phases: [
+    { title: '딥리서치', detail: 'NotebookLM이 웹에서 논문 자동 검색 및 소스 추가' },
     { title: '쿼리 생성', detail: 'Claude가 연구 도메인 특화 7개 쿼리 생성' },
     { title: 'NotebookLM 탐색', detail: '7개 쿼리 병렬 실행' },
     { title: '데이터 추출', detail: '각 라운드 결과에서 수치 파싱' },
@@ -64,6 +65,31 @@ const outputPath    = fileConfig?.outputPath    || CONFIG.outputPath;
 if (!notebookId || notebookId === 'YOUR_NOTEBOOK_ID_HERE') {
   throw new Error('노트북 ID가 없습니다. pipeline-config.json 파일이 저장됐는지 확인하세요.');
 }
+
+// ── Phase 0: NotebookLM 딥리서치 — 논문 자동 검색 및 소스 추가 ──────────────
+phase('딥리서치');
+
+await agent(`
+NotebookLM MCP의 딥리서치 기능으로 아래 주제 논문을 자동 검색하여 노트북에 소스로 추가하세요.
+
+【연구 주제】
+${material}의 ${propertyName}(단위: ${unit}) — ${categoryLabel} 기준 실험/시뮬레이션 데이터
+
+【실행 순서】
+1. mcp__notebooklm-mcp__research_start 도구를 호출하세요.
+   - 노트북 ID: "${notebookId}"
+   - 검색 주제: "${material} ${propertyName} ${unit} experimental measurement research papers"
+   (영어로 검색해야 더 많은 논문이 검색됩니다)
+
+2. research_start가 반환한 research ID로 mcp__notebooklm-mcp__research_status를 호출하여 상태를 확인하세요.
+   완료(complete/done) 상태가 될 때까지 반복 확인하세요.
+
+3. 완료되면 mcp__notebooklm-mcp__research_import를 호출하여 검색된 논문을 노트북 소스로 추가하세요.
+
+추가된 소스 수를 반환하세요.
+`, { label: '딥리서치 실행', phase: '딥리서치' });
+
+log('딥리서치 완료 — 논문 소스 추가됨');
 
 // ── Phase 1: 7개 쿼리 생성 ────────────────────────────────────────────────────
 phase('쿼리 생성');

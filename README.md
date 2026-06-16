@@ -13,20 +13,17 @@
 3. 설치 후 Claude Code 실행
 4. Claude Pro 구독 필요 (월 $20) — 구독하지 않았다면 앱 내에서 가입
 
-### 2. NotebookLM 로그인
+### 2. Node.js 설치 확인
 
-**Windows 시작 메뉴에서 PowerShell을 열고** 아래 두 명령을 순서대로 실행합니다:
+Claude Code 채팅창에서:
 
-```powershell
-npm install -g notebooklm-mcp
-nlm login
+```
+! node --version
 ```
 
-브라우저가 열리면 NotebookLM에서 사용하는 Google 계정으로 로그인합니다.
+버전이 출력되면 됩니다. Node.js가 없다면 https://nodejs.org 에서 설치하세요.
 
-> **Claude Code 채팅창의 `!` 명령으로는 안 됩니다.** `!`는 Git Bash를 사용하는데, Windows에서 npm 전역 바이너리가 Git Bash PATH에 없습니다. 반드시 PowerShell에서 직접 실행하세요.
-
-> **MCP 설정은 자동입니다.** 이 repo에 `.claude/settings.json`이 포함되어 있어 clone 후 Claude Code가 NotebookLM MCP를 자동으로 인식합니다.
+> **MCP 설정과 설치는 자동입니다.** 이 repo에 `.claude/settings.json`이 포함되어 있어 clone 후 Claude Code가 NotebookLM MCP를 자동으로 내려받고 실행합니다. 처음 파이프라인 실행 시 Google 로그인 창이 자동으로 열립니다.
 
 ---
 
